@@ -1,7 +1,9 @@
 from django.contrib import admin
 from .models import Task
 from django.contrib.auth.models import Group,Permission
-from django.contrib.auth.models import User
+#from django.conf import settings
+#User = settings.AUTH_USER_MODEL
+from user.models import User
 
 
 
@@ -58,13 +60,27 @@ class TodoAdmin(admin.ModelAdmin):
     
     #exclude = ('owner',)
     def get_form(self, request, obj=None, **kwargs):
-        print(request.user.groups.filter(name="admin"))
+        #print(request.user.groups.filter(name="admin"))
         self.exclude = []
+        self.readonly_fields=[]
         if not request.user.groups.filter(name="admin"):
-            self.exclude.append('owner') #here!
+            #self.exclude.append('owner') #here!
+            self.readonly_fields.append('owner')
         return super(TodoAdmin, self).get_form(request, obj, **kwargs)
     
     def save_model( self, request, obj, form, change ):
+        print(obj)
+        if obj.owner_id is None:
+            title = obj.title
+            description = obj.description
+            precondition_task = request.POST['precondition_tasks'] or None
+            time_to_send = obj.time_to_send
+            user_id = request.user.id
+            task_obj = Task.objects.create(title=title,description=description,time_to_send=time_to_send,owner_id=user_id)#,precondition_task=precondition_task)
+            task_obj.precondition_tasks.add(precondition_task)  
+            task_obj.save()
+        else:
+            pass
         obj.save()
 
     
