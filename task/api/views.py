@@ -8,7 +8,6 @@ from django.http import HttpResponse
 class CheckTasks(APIView):
     """
         This api checks all tasks to see if they can possible or not
-         
     """
     def compare_two_task(self,first_task,second_task):
         if first_task.time_to_send < second_task.time_to_send:
@@ -28,7 +27,7 @@ class CheckTasks(APIView):
                 precondition_tasks = i.precondition_tasks.all().first()
                 compare_result = self.compare_two_task(first_task = i,second_task = precondition_tasks)
                 if compare_result:
-                    return HttpResponse("ok")
+                    return HttpResponse("ALL THE TASKS AND PRECONDITIONS ARE OK")
                 else:
                     #print("here")
                     return HttpResponse(f" this set of tasks is not possible beacuse of task with id {i.id} and the precondition_tasks with id {precondition_tasks.id}",status=404)
@@ -43,4 +42,4 @@ class CheckTasks(APIView):
                     else:
                         return HttpResponse(f"this set of tasks is not possible beacuse of task with id {i.id} and the precondition_task with id {j.id}",status=404)
                     
-                return HttpResponse("True")
+                return HttpResponse("ALL THE TASKS AND PRECONDITIONS ARE OK")
