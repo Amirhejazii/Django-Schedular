@@ -56,20 +56,17 @@ class TodoAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return True
 
-    # dont allow current_user to create object for another 
-    
-    #exclude = ('owner',)
+
     def get_form(self, request, obj=None, **kwargs):
         #print(request.user.groups.filter(name="admin"))
         self.exclude = []
         self.readonly_fields=[]
         if not request.user.groups.filter(name="admin"):
-            #self.exclude.append('owner') #here!
             self.readonly_fields.append('owner')
         return super(TodoAdmin, self).get_form(request, obj, **kwargs)
     
+    
     def save_model( self, request, obj, form, change ):
-        print(obj)
         if obj.owner_id is None:
             title = obj.title
             description = obj.description
