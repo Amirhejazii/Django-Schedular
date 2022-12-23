@@ -18,28 +18,28 @@ class CheckTasks(APIView):
         
     def get(self,request):
         all_task = Task.objects.all()
+        task_true = 0
+        task_false = 0 
         for i in all_task:
-            
             if i.precondition_tasks.all().count() == 0:
-                pass
+                task_true+=1
+                continue
             
-            elif i.precondition_tasks.all().count() == 1:
-                precondition_tasks = i.precondition_tasks.all().first()
-                compare_result = self.compare_two_task(first_task = i,second_task = precondition_tasks)
-                if compare_result:
-                    return HttpResponse("ALL THE TASKS AND PRECONDITIONS ARE OK")
+            precondition_task = i.precondition_tasks.all()
+            
+            if precondition_task.count() == 1 :
+                pre_task = precondition_task.first()
+                if pre_task.time_to_send >= i.time_to_send:
+                    return HttpResponse(f"THERE IS PROBLEM IN TASK WITH ID {i.id} AND TITLE {i.title}",status = 404 )
                 else:
-                    #print("here")
-                    return HttpResponse(f" this set of tasks is not possible beacuse of task with id {i.id} and the precondition_tasks with id {precondition_tasks.id}",status=404)
+                    continue
                 
-            
-            elif i.precondition_tasks.all().count() >1:
-                precondition_tasks = i.precondition_tasks.all()
-                for j in precondition_tasks:
-                    compare_result = self.compare_two_task(first_task = i,second_task=j)
-                    if compare_result:
-                        pass
+            elif precondition_task.count() >1 :
+                for pre_task in precondition_task:
+                    if pre_task.time_to_send >= i.time_to_send:
+                        return HttpResponse(f"THERE IS PROBLEM IN TASK WITH ID {i.id}",status = 404 )
                     else:
-                        return HttpResponse(f"this set of tasks is not possible beacuse of task with id {i.id} and the precondition_task with id {j.id}",status=404)
+                        continue
                     
-                return HttpResponse("ALL THE TASKS AND PRECONDITIONS ARE OK")
+        return HttpResponse(" ALL THE TASKS ARE OK ",status = 200)
+                

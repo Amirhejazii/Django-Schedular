@@ -33,7 +33,7 @@ class TodoAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'time_to_send')
     ordering = ('time_to_send', 'title')
     search_fields = ('title', 'description', 'owner')
-    list_filter = ('owner', 'time_to_send')
+    list_filter = ('owner', 'time_to_send','description','title')
     # allow usser just access to his/her own objects
     def get_queryset(self, request):
         qs = super(TodoAdmin, self).get_queryset(request)
